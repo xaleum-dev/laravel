@@ -4,19 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Author;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
 class AuthorController extends Controller
 {
     public function index()
     {
-        // Ambil semua author beserta buku yang mereka tulis
-        $authors = Author::with('books')->get();
+        return response()->json(Author::all());
+    }
 
-        return response()->json([
-            "success" => true,
-            "message" => "Get all resources",
-            "data" => $authors
-        ], 200);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:authors,email',
+            'bio' => 'nullable|string',
+        ]);
+
+        $author = Author::create($request->only(['name', 'email', 'bio']));
+
+        return response()->json($author, 201);
     }
 }
+
